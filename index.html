@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lava Reads 🌋📚 - Book Picker Wheel</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #1a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(255, 80, 0, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(255, 30, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(255, 120, 0, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .header {
+    z-index: 1;
+    text-align: center;
+    padding: 30px 20px 10px;
+  }
+
+  .header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    background: linear-gradient(135deg, #ff6b35, #ffba08, #ff6b35);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s ease infinite;
+    letter-spacing: 2px;
+  }
+
+  .header p {
+    font-size: 1rem;
+    color: #ff9a5c;
+    margin-top: 4px;
+    opacity: 0.8;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .wheel-container {
+    z-index: 1;
+    position: relative;
+    margin: 20px auto;
+    width: min(85vw, 420px);
+    height: min(85vw, 420px);
+  }
+
+  .pointer {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 0;
+    height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 36px solid #ffba08;
+    filter: drop-shadow(0 4px 12px rgba(255, 186, 8, 0.6));
+    transition: filter 0.2s;
+  }
+
+  .pointer::after {
+    content: '';
+    position: absolute;
+    top: -42px;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    background: #ffba08;
+    border-radius: 50%;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.3));
+  }
+
+  .spin-btn {
+    z-index: 1;
+    margin: 20px auto;
+    display: block;
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    padding: 16px 60px;
+    border: none;
+    border-radius: 60px;
+    background: linear-gradient(135deg, #ff6b35, #e8420e);
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    box-shadow: 0 6px 30px rgba(255, 107, 53, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .spin-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 40px rgba(255, 107, 53, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .spin-btn:active {
+    transform: translateY(1px) scale(0.98);
+  }
+
+  .spin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .spin-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: btnSheen 4s ease infinite;
+  }
+
+  @keyframes btnSheen {
+    0%, 100% { transform: translateX(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) rotate(45deg); }
+  }
+
+  .names-section {
+    z-index: 1;
+    width: min(90vw, 500px);
+    margin: 10px auto 40px;
+    text-align: center;
+  }
+
+  .edit-toggle {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: none;
+    border: 2px solid rgba(255, 107, 53, 0.4);
+    color: #ff9a5c;
+    padding: 8px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .edit-toggle:hover {
+    border-color: #ff6b35;
+    color: #ffba08;
+    background: rgba(255, 107, 53, 0.1);
+  }
+
+  .names-editor {
+    display: none;
+    margin-top: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .names-editor.open { display: block; }
+
+  .names-editor textarea {
+    width: 100%;
+    min-height: 100px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    padding: 12px;
+    resize: vertical;
+    outline: none;
+  }
+
+  .names-editor textarea:focus {
+    border-color: #ff6b35;
+  }
+
+  .names-editor .save-btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    margin-top: 10px;
+    padding: 8px 30px;
+    border: none;
+    border-radius: 30px;
+    background: #ff6b35;
+    color: #fff;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .names-editor .save-btn:hover { background: #e8420e; }
+  .names-editor .hint { font-size: 0.8rem; color: #ff9a5c; opacity: 0.6; margin-top: 6px; }
+
+  /* Winner overlay */
+  .winner-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .winner-overlay.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .winner-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(3rem, 12vw, 6rem);
+    background: linear-gradient(135deg, #ffba08, #ff6b35, #ffba08);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 2s ease infinite, bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .winner-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.2rem;
+    color: #ff9a5c;
+    margin-bottom: 10px;
+    animation: fadeIn 0.5s ease 0.3s both;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .winner-subtitle {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.4rem;
+    color: #ffba08;
+    margin-top: 15px;
+    animation: fadeIn 0.5s ease 0.6s both;
+  }
+
+  .winner-close {
+    margin-top: 40px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    padding: 12px 40px;
+    border: 2px solid rgba(255, 186, 8, 0.5);
+    background: none;
+    color: #ffba08;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    animation: fadeIn 0.5s ease 0.9s both;
+    transition: all 0.2s;
+  }
+
+  .winner-close:hover {
+    background: rgba(255, 186, 8, 0.15);
+    border-color: #ffba08;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.08); }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed;
+    z-index: 101;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Lava bubbles background */
+  .lava-bubble {
+    position: fixed;
+    bottom: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 120, 0, 0.4), rgba(255, 40, 0, 0.1));
+    pointer-events: none;
+    z-index: 0;
+    animation: bubbleRise linear infinite;
+  }
+
+  @keyframes bubbleRise {
+    0% { transform: translateY(0) scale(1); opacity: 0.6; }
+    50% { opacity: 0.3; }
+    100% { transform: translateY(-110vh) scale(0.3); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lava Reads 🌋📚</h1>
+  <p>Who picks the next book?</p>
+</div>
+
+<div class="wheel-container">
+  <div class="pointer"></div>
+  <canvas id="wheelCanvas"></canvas>
+</div>
+
+<button class="spin-btn" id="spinBtn" onclick="spinWheel()">🔥 SPIN 🔥</button>
+
+<div class="names-section">
+  <button class="edit-toggle" onclick="toggleEditor()">✏️ Edit Names</button>
+  <div class="names-editor" id="namesEditor">
+    <textarea id="namesInput"></textarea>
+    <p class="hint">One name per line</p>
+    <button class="save-btn" onclick="saveNames()">Save & Update Wheel</button>
+  </div>
+</div>
+
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-label">📖 Next book picked by...</div>
+  <div class="winner-name" id="winnerName"></div>
+  <div class="winner-subtitle">picks the next book! 🔥</div>
+  <button class="winner-close" onclick="closeWinner()">Let's Go!</button>
+</div>
+
+<script>
+  // --- CONFIG ---
+  let names = ['Gavin', 'Erin', 'Mike', 'Scott', 'Jess', 'Dan', 'Sarah', 'Chris'];
+
+  const COLORS = [
+    '#ff6b35', '#e8420e', '#ffba08', '#cc3700',
+    '#ff8c42', '#d4560e', '#ffa62b', '#b52e00',
+    '#ff9a5c', '#c44200', '#ffd166', '#a82400'
+  ];
+
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  let currentAngle = 0;
+  let spinning = false;
+
+  function initCanvas() {
+    const size = Math.min(window.innerWidth * 0.85, 420);
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function drawWheel() {
+    initCanvas();
+    const size = parseInt(canvas.style.width);
+    const cx = size / 2;
+    const cy = size / 2;
+    const r = size / 2 - 4;
+    const arc = (2 * Math.PI) / names.length;
+
+    ctx.clearRect(0, 0, size, size);
+
+    // Outer glow ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 3, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'rgba(255, 186, 8, 0.3)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    names.forEach((name, i) => {
+      const startAngle = currentAngle + i * arc;
+      const endAngle = startAngle + arc;
+
+      // Slice
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fillStyle = COLORS[i % COLORS.length];
+      ctx.fill();
+
+      // Slice border
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Text
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(startAngle + arc / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.min(18, 140 / names.length)}px 'Nunito', sans-serif`;
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 4;
+      ctx.fillText(name, r - 16, 5);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    });
+
+    // Center circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1a0a0a';
+    ctx.fill();
+    ctx.strokeStyle = '#ffba08';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 8, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ffba08';
+    ctx.fill();
+  }
+
+  function spinWheel() {
+    if (spinning) return;
+    spinning = true;
+    document.getElementById('spinBtn').disabled = true;
+
+    const totalRotation = (Math.random() * 5 + 8) * Math.PI * 2;
+    const duration = 4000 + Math.random() * 2000;
+    const startAngle = currentAngle;
+    const startTime = performance.now();
+
+    // Easing: cubic out with extra deceleration at end
+    function easeOut(t) {
+      const t1 = 1 - t;
+      return 1 - t1 * t1 * t1 * t1;
+    }
+
+    function animate(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOut(progress);
+
+      currentAngle = startAngle + totalRotation * easedProgress;
+      drawWheel();
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        spinning = false;
+        document.getElementById('spinBtn').disabled = false;
+
+        // Figure out winner (pointer is at top, which is -PI/2)
+        const arc = (2 * Math.PI) / names.length;
+        const normalizedAngle = ((2 * Math.PI) - (currentAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+        // Pointer is at top (-90 degrees = 3PI/2 from 0)
+        const pointerAngle = (normalizedAngle + Math.PI * 1.5) % (2 * Math.PI);
+        const winnerIndex = Math.floor(pointerAngle / arc) % names.length;
+
+        setTimeout(() => showWinner(names[winnerIndex]), 300);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  function showWinner(name) {
+    document.getElementById('winnerName').textContent = name;
+    document.getElementById('winnerOverlay').classList.add('show');
+    launchConfetti();
+  }
+
+  function closeWinner() {
+    document.getElementById('winnerOverlay').classList.remove('show');
+    document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+  }
+
+  function launchConfetti() {
+    const confettiColors = ['#ff6b35', '#ffba08', '#e8420e', '#ff8c42', '#ffd166', '#fff', '#ff4444', '#44ff44'];
+    const shapes = ['square', 'circle'];
+
+    for (let i = 0; i < 120; i++) {
+      const piece = document.createElement('div');
+      piece.classList.add('confetti-piece');
+      const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const size = Math.random() * 10 + 6;
+
+      piece.style.width = size + 'px';
+      piece.style.height = size + 'px';
+      piece.style.background = color;
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.top = '-10px';
+      piece.style.borderRadius = shape === 'circle' ? '50%' : '2px';
+      piece.style.animation = `confettiFall ${Math.random() * 2 + 2}s linear ${Math.random() * 0.5}s forwards`;
+
+      document.body.appendChild(piece);
+    }
+
+    setTimeout(() => {
+      document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+    }, 5000);
+  }
+
+  // Lava bubbles background
+  function createBubble() {
+    const bubble = document.createElement('div');
+    bubble.classList.add('lava-bubble');
+    const size = Math.random() * 40 + 10;
+    bubble.style.width = size + 'px';
+    bubble.style.height = size + 'px';
+    bubble.style.left = Math.random() * 100 + 'vw';
+    bubble.style.animationDuration = (Math.random() * 8 + 6) + 's';
+    document.body.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 14000);
+  }
+
+  setInterval(createBubble, 800);
+
+  // Editor
+  function toggleEditor() {
+    const editor = document.getElementById('namesEditor');
+    editor.classList.toggle('open');
+    if (editor.classList.contains('open')) {
+      document.getElementById('namesInput').value = names.join('\n');
+    }
+  }
+
+  function saveNames() {
+    const input = document.getElementById('namesInput').value.trim();
+    const newNames = input.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+    if (newNames.length < 2) {
+      alert('Need at least 2 names!');
+      return;
+    }
+    names = newNames;
+    drawWheel();
+    document.getElementById('namesEditor').classList.remove('open');
+  }
+
+  // Init
+  window.addEventListener('resize', drawWheel);
+  drawWheel();
+</script>
+
+</body>
+</html>
