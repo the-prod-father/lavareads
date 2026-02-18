@@ -3,14 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lava Reads 🌋📚 - Book Picker Wheel</title>
+<title>Lava Reads - Book Picker Wheel</title>
+<meta property="og:title" content="Lava Reads - Book Club">
+<meta property="og:description" content="Shore reads. Strong opinions.">
+<meta property="og:image" content="https://lavareads.vercel.app/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Nunito', sans-serif;
-    background: #1a0a0a;
+    background: linear-gradient(180deg, #1a3a5c 0%, #1e5a7e 30%, #2a7ba5 60%, #d4a574 85%, #e8c99b 92%, #f5e6d0 100%);
+    background-attachment: fixed;
     color: #fff;
     min-height: 100vh;
     display: flex;
@@ -20,53 +24,176 @@
     position: relative;
   }
 
-  body::before {
-    content: '';
+  /* Ocean wave layers at bottom */
+  .ocean {
     position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 50% 100%, rgba(255, 80, 0, 0.15) 0%, transparent 60%),
-      radial-gradient(ellipse at 20% 80%, rgba(255, 30, 0, 0.1) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(255, 120, 0, 0.1) 0%, transparent 50%);
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
     pointer-events: none;
     z-index: 0;
+    overflow: hidden;
+  }
+
+  .wave {
+    position: absolute;
+    bottom: 0;
+    left: -5%;
+    width: 110%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M0,224L48,208C96,192,192,160,288,165.3C384,171,480,213,576,224C672,235,768,213,864,186.7C960,160,1056,128,1152,133.3C1248,139,1344,181,1392,202.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'/%3E%3C/svg%3E") repeat-x;
+    background-size: 1440px 180px;
+    animation: waveFlow 8s linear infinite;
+  }
+
+  .wave:nth-child(2) {
+    bottom: -10px;
+    opacity: 0.6;
+    animation: waveFlow 12s linear infinite reverse;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,229.3C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'/%3E%3C/svg%3E") repeat-x;
+    background-size: 1440px 180px;
+  }
+
+  .wave:nth-child(3) {
+    bottom: -20px;
+    opacity: 0.4;
+    animation: waveFlow 15s linear infinite;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2387CEEB' fill-opacity='0.15' d='M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,165.3C672,160,768,192,864,197.3C960,203,1056,181,1152,165.3C1248,149,1344,139,1392,133.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'/%3E%3C/svg%3E") repeat-x;
+    background-size: 1440px 180px;
+  }
+
+  @keyframes waveFlow {
+    0% { background-position-x: 0; }
+    100% { background-position-x: 1440px; }
+  }
+
+  /* Fish */
+  .fish {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    font-size: 24px;
+    opacity: 0.6;
+    animation: swimRight linear infinite;
+  }
+
+  .fish.left {
+    animation-name: swimLeft;
+  }
+
+  @keyframes swimRight {
+    0% { transform: translateX(-60px) translateY(0px); }
+    25% { transform: translateX(25vw) translateY(-12px); }
+    50% { transform: translateX(50vw) translateY(8px); }
+    75% { transform: translateX(75vw) translateY(-6px); }
+    100% { transform: translateX(110vw) translateY(0px); }
+  }
+
+  @keyframes swimLeft {
+    0% { transform: translateX(110vw) translateY(0px) scaleX(-1); }
+    25% { transform: translateX(75vw) translateY(10px) scaleX(-1); }
+    50% { transform: translateX(50vw) translateY(-8px) scaleX(-1); }
+    75% { transform: translateX(25vw) translateY(12px) scaleX(-1); }
+    100% { transform: translateX(-60px) translateY(0px) scaleX(-1); }
+  }
+
+  /* Bubbles */
+  .bubble {
+    position: fixed;
+    bottom: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), rgba(135, 206, 235, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+    z-index: 0;
+    animation: bubbleFloat linear infinite;
+  }
+
+  @keyframes bubbleFloat {
+    0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.5; }
+    25% { transform: translateY(-25vh) translateX(10px) scale(1.05); opacity: 0.4; }
+    50% { transform: translateY(-50vh) translateX(-8px) scale(0.95); opacity: 0.3; }
+    75% { transform: translateY(-75vh) translateX(12px) scale(0.9); opacity: 0.2; }
+    100% { transform: translateY(-105vh) translateX(0) scale(0.8); opacity: 0; }
+  }
+
+  /* Seagull */
+  .seagull {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+    animation: gullFly linear infinite;
+  }
+
+  .seagull::before, .seagull::after {
+    content: '';
+    position: absolute;
+    background: #fff;
+    width: 18px;
+    height: 3px;
+    border-radius: 50%;
+    top: 0;
+  }
+
+  .seagull::before {
+    transform: rotate(-20deg);
+    left: -10px;
+  }
+
+  .seagull::after {
+    transform: rotate(20deg);
+    left: 10px;
+  }
+
+  @keyframes gullFly {
+    0% { transform: translate(-50px, 0); }
+    50% { transform: translate(55vw, -30px); }
+    100% { transform: translate(110vw, 10px); }
   }
 
   .header {
     z-index: 1;
     text-align: center;
-    padding: 30px 20px 10px;
+    padding: 20px 20px 0;
   }
 
-  .header h1 {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    background: linear-gradient(135deg, #ff6b35, #ffba08, #ff6b35);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 3s ease infinite;
-    letter-spacing: 2px;
+  .header img {
+    width: min(280px, 70vw);
+    height: auto;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+    animation: logoFloat 4s ease-in-out infinite;
+  }
+
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
   }
 
   .header p {
+    font-family: 'Fredoka One', cursive;
     font-size: 1rem;
-    color: #ff9a5c;
-    margin-top: 4px;
+    color: #f5e6d0;
+    margin-top: 6px;
     opacity: 0.8;
+    letter-spacing: 2px;
   }
 
-  @keyframes shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+  .subtitle {
+    z-index: 1;
+    font-size: 0.95rem;
+    color: #87CEEB;
+    margin-top: 2px;
+    opacity: 0.7;
   }
 
   .wheel-container {
     z-index: 1;
     position: relative;
-    margin: 20px auto;
-    width: min(85vw, 420px);
-    height: min(85vw, 420px);
+    margin: 16px auto;
+    width: min(80vw, 400px);
+    height: min(80vw, 400px);
   }
 
   .pointer {
@@ -77,21 +204,20 @@
     z-index: 10;
     width: 0;
     height: 0;
-    border-left: 18px solid transparent;
-    border-right: 18px solid transparent;
-    border-top: 36px solid #ffba08;
-    filter: drop-shadow(0 4px 12px rgba(255, 186, 8, 0.6));
-    transition: filter 0.2s;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 34px solid #ff8c42;
+    filter: drop-shadow(0 4px 12px rgba(255, 140, 66, 0.5));
   }
 
   .pointer::after {
     content: '';
     position: absolute;
-    top: -42px;
-    left: -6px;
-    width: 12px;
-    height: 12px;
-    background: #ffba08;
+    top: -40px;
+    left: -5px;
+    width: 10px;
+    height: 10px;
+    background: #ff8c42;
     border-radius: 50%;
   }
 
@@ -99,24 +225,24 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.3));
+    filter: drop-shadow(0 0 30px rgba(42, 123, 165, 0.3));
   }
 
   .spin-btn {
     z-index: 1;
-    margin: 20px auto;
+    margin: 16px auto;
     display: block;
     font-family: 'Fredoka One', cursive;
-    font-size: clamp(1.4rem, 4vw, 2rem);
-    padding: 16px 60px;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    padding: 14px 55px;
     border: none;
     border-radius: 60px;
-    background: linear-gradient(135deg, #ff6b35, #e8420e);
+    background: linear-gradient(135deg, #ff8c42, #e86b20);
     color: #fff;
     cursor: pointer;
     letter-spacing: 2px;
     text-transform: uppercase;
-    box-shadow: 0 6px 30px rgba(255, 107, 53, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 30px rgba(255, 140, 66, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     transition: transform 0.15s, box-shadow 0.15s;
     position: relative;
     overflow: hidden;
@@ -124,18 +250,11 @@
 
   .spin-btn:hover {
     transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 8px 40px rgba(255, 107, 53, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 40px rgba(255, 140, 66, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
 
-  .spin-btn:active {
-    transform: translateY(1px) scale(0.98);
-  }
-
-  .spin-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
+  .spin-btn:active { transform: translateY(1px) scale(0.98); }
+  .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
   .spin-btn::before {
     content: '';
@@ -144,7 +263,7 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.12), transparent);
     animation: btnSheen 4s ease infinite;
   }
 
@@ -155,37 +274,38 @@
 
   .names-section {
     z-index: 1;
-    width: min(90vw, 500px);
-    margin: 10px auto 40px;
+    width: min(90vw, 480px);
+    margin: 8px auto 40px;
     text-align: center;
   }
 
   .edit-toggle {
     font-family: 'Nunito', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     background: none;
-    border: 2px solid rgba(255, 107, 53, 0.4);
-    color: #ff9a5c;
-    padding: 8px 24px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    color: #f5e6d0;
+    padding: 8px 22px;
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .edit-toggle:hover {
-    border-color: #ff6b35;
-    color: #ffba08;
-    background: rgba(255, 107, 53, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .names-editor {
     display: none;
-    margin-top: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 107, 53, 0.2);
+    margin-top: 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    padding: 20px;
+    padding: 18px;
+    backdrop-filter: blur(10px);
   }
 
   .names-editor.open { display: block; }
@@ -193,8 +313,8 @@
   .names-editor textarea {
     width: 100%;
     min-height: 100px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 107, 53, 0.3);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     color: #fff;
     font-family: 'Nunito', sans-serif;
@@ -204,37 +324,36 @@
     outline: none;
   }
 
-  .names-editor textarea:focus {
-    border-color: #ff6b35;
-  }
+  .names-editor textarea:focus { border-color: #ff8c42; }
 
   .names-editor .save-btn {
     font-family: 'Nunito', sans-serif;
     font-weight: 900;
     margin-top: 10px;
-    padding: 8px 30px;
+    padding: 8px 28px;
     border: none;
     border-radius: 30px;
-    background: #ff6b35;
+    background: #ff8c42;
     color: #fff;
     font-size: 0.95rem;
     cursor: pointer;
     transition: background 0.2s;
   }
 
-  .names-editor .save-btn:hover { background: #e8420e; }
-  .names-editor .hint { font-size: 0.8rem; color: #ff9a5c; opacity: 0.6; margin-top: 6px; }
+  .names-editor .save-btn:hover { background: #e86b20; }
+  .names-editor .hint { font-size: 0.8rem; color: #f5e6d0; opacity: 0.5; margin-top: 6px; }
 
   /* Winner overlay */
   .winner-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(10, 30, 50, 0.9);
     z-index: 100;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    backdrop-filter: blur(8px);
   }
 
   .winner-overlay.show {
@@ -245,7 +364,7 @@
   .winner-name {
     font-family: 'Fredoka One', cursive;
     font-size: clamp(3rem, 12vw, 6rem);
-    background: linear-gradient(135deg, #ffba08, #ff6b35, #ffba08);
+    background: linear-gradient(135deg, #ff8c42, #ffba08, #ff8c42);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -254,10 +373,15 @@
     padding: 0 20px;
   }
 
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
   .winner-label {
     font-family: 'Nunito', sans-serif;
     font-size: 1.2rem;
-    color: #ff9a5c;
+    color: #87CEEB;
     margin-bottom: 10px;
     animation: fadeIn 0.5s ease 0.3s both;
     letter-spacing: 4px;
@@ -266,20 +390,20 @@
 
   .winner-subtitle {
     font-family: 'Nunito', sans-serif;
-    font-size: 1.4rem;
-    color: #ffba08;
-    margin-top: 15px;
+    font-size: 1.3rem;
+    color: #f5e6d0;
+    margin-top: 12px;
     animation: fadeIn 0.5s ease 0.6s both;
   }
 
   .winner-close {
-    margin-top: 40px;
+    margin-top: 35px;
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
     padding: 12px 40px;
-    border: 2px solid rgba(255, 186, 8, 0.5);
+    border: 2px solid rgba(255, 140, 66, 0.5);
     background: none;
-    color: #ffba08;
+    color: #ff8c42;
     border-radius: 30px;
     font-size: 1rem;
     cursor: pointer;
@@ -288,8 +412,8 @@
   }
 
   .winner-close:hover {
-    background: rgba(255, 186, 8, 0.15);
-    border-color: #ffba08;
+    background: rgba(255, 140, 66, 0.15);
+    border-color: #ff8c42;
   }
 
   @keyframes fadeIn {
@@ -308,8 +432,6 @@
   .confetti-piece {
     position: fixed;
     z-index: 101;
-    width: 10px;
-    height: 10px;
     pointer-events: none;
   }
 
@@ -317,29 +439,18 @@
     0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
     100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
-
-  /* Lava bubbles background */
-  .lava-bubble {
-    position: fixed;
-    bottom: -20px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 120, 0, 0.4), rgba(255, 40, 0, 0.1));
-    pointer-events: none;
-    z-index: 0;
-    animation: bubbleRise linear infinite;
-  }
-
-  @keyframes bubbleRise {
-    0% { transform: translateY(0) scale(1); opacity: 0.6; }
-    50% { opacity: 0.3; }
-    100% { transform: translateY(-110vh) scale(0.3); opacity: 0; }
-  }
 </style>
 </head>
 <body>
 
+<div class="ocean">
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+</div>
+
 <div class="header">
-  <h1>Lava Reads 🌋📚</h1>
+  <img src="logo.png" alt="Lava Reads">
   <p>Who picks the next book?</p>
 </div>
 
@@ -348,10 +459,10 @@
   <canvas id="wheelCanvas"></canvas>
 </div>
 
-<button class="spin-btn" id="spinBtn" onclick="spinWheel()">🔥 SPIN 🔥</button>
+<button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
 
 <div class="names-section">
-  <button class="edit-toggle" onclick="toggleEditor()">✏️ Edit Names</button>
+  <button class="edit-toggle" onclick="toggleEditor()">Edit Names</button>
   <div class="names-editor" id="namesEditor">
     <textarea id="namesInput"></textarea>
     <p class="hint">One name per line</p>
@@ -360,10 +471,10 @@
 </div>
 
 <div class="winner-overlay" id="winnerOverlay">
-  <div class="winner-label">📖 Next book picked by...</div>
+  <div class="winner-label">Next book picked by...</div>
   <div class="winner-name" id="winnerName"></div>
-  <div class="winner-subtitle">picks the next book! 🔥</div>
-  <button class="winner-close" onclick="closeWinner()">Let's Go!</button>
+  <div class="winner-subtitle" id="winnerSubtitle"></div>
+  <button class="winner-close" onclick="closeWinner()">Cowabunga!</button>
 </div>
 
 <script>
@@ -371,9 +482,31 @@
   let names = ['Gavin', 'Erin', 'Mike', 'Scott', 'Jess', 'Dan', 'Sarah', 'Chris'];
 
   const COLORS = [
-    '#ff6b35', '#e8420e', '#ffba08', '#cc3700',
-    '#ff8c42', '#d4560e', '#ffa62b', '#b52e00',
-    '#ff9a5c', '#c44200', '#ffd166', '#a82400'
+    '#2a7ba5', '#ff8c42', '#3d9dc9', '#e86b20',
+    '#48b4d4', '#d4a574', '#1e5a7e', '#ffba08',
+    '#5cc1e0', '#c4834a', '#2889b0', '#f09030'
+  ];
+
+  const WINNER_PHRASES = [
+    'picks the next book!',
+    'you are the chosen one!',
+    'the ocean has spoken!',
+    'surf\'s up, it\'s your pick!',
+    'ride that wave to the bookstore!',
+    'the tide brought your name in!',
+    'shore thing, it\'s you!',
+    'catch this wave of responsibility!'
+  ];
+
+  const FISH_TYPES = [
+    { emoji: '\u{1F41F}', size: 22 },  // fish
+    { emoji: '\u{1F420}', size: 20 },  // tropical fish
+    { emoji: '\u{1F421}', size: 18 },  // blowfish
+    { emoji: '\u{1F419}', size: 24 },  // octopus
+    { emoji: '\u{1F41A}', size: 16 },  // shell
+    { emoji: '\u{1F980}', size: 20 },  // crab
+    { emoji: '\u{1F990}', size: 18 },  // shrimp
+    { emoji: '\u{1F42C}', size: 28 },  // dolphin
   ];
 
   const canvas = document.getElementById('wheelCanvas');
@@ -382,7 +515,7 @@
   let spinning = false;
 
   function initCanvas() {
-    const size = Math.min(window.innerWidth * 0.85, 420);
+    const size = Math.min(window.innerWidth * 0.8, 400);
     const dpr = window.devicePixelRatio || 1;
     canvas.width = size * dpr;
     canvas.height = size * dpr;
@@ -401,10 +534,10 @@
 
     ctx.clearRect(0, 0, size, size);
 
-    // Outer glow ring
+    // Outer ring
     ctx.beginPath();
     ctx.arc(cx, cy, r + 3, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(255, 186, 8, 0.3)';
+    ctx.strokeStyle = 'rgba(255, 140, 66, 0.3)';
     ctx.lineWidth = 3;
     ctx.stroke();
 
@@ -421,7 +554,7 @@
       ctx.fill();
 
       // Slice border
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
@@ -432,7 +565,7 @@
       ctx.textAlign = 'right';
       ctx.fillStyle = '#fff';
       ctx.font = `bold ${Math.min(18, 140 / names.length)}px 'Nunito', sans-serif`;
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
       ctx.shadowBlur = 4;
       ctx.fillText(name, r - 16, 5);
       ctx.shadowBlur = 0;
@@ -441,14 +574,14 @@
 
     // Center circle
     ctx.beginPath();
-    ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
-    ctx.fillStyle = '#1a0a0a';
+    ctx.arc(cx, cy, 26, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1a3a5c';
     ctx.fill();
-    ctx.strokeStyle = '#ffba08';
+    ctx.strokeStyle = '#ff8c42';
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // Center dot
+    // Center sun
     ctx.beginPath();
     ctx.arc(cx, cy, 8, 0, 2 * Math.PI);
     ctx.fillStyle = '#ffba08';
@@ -465,7 +598,6 @@
     const startAngle = currentAngle;
     const startTime = performance.now();
 
-    // Easing: cubic out with extra deceleration at end
     function easeOut(t) {
       const t1 = 1 - t;
       return 1 - t1 * t1 * t1 * t1;
@@ -485,10 +617,8 @@
         spinning = false;
         document.getElementById('spinBtn').disabled = false;
 
-        // Figure out winner (pointer is at top, which is -PI/2)
         const arc = (2 * Math.PI) / names.length;
         const normalizedAngle = ((2 * Math.PI) - (currentAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-        // Pointer is at top (-90 degrees = 3PI/2 from 0)
         const pointerAngle = (normalizedAngle + Math.PI * 1.5) % (2 * Math.PI);
         const winnerIndex = Math.floor(pointerAngle / arc) % names.length;
 
@@ -501,6 +631,8 @@
 
   function showWinner(name) {
     document.getElementById('winnerName').textContent = name;
+    document.getElementById('winnerSubtitle').textContent =
+      WINNER_PHRASES[Math.floor(Math.random() * WINNER_PHRASES.length)];
     document.getElementById('winnerOverlay').classList.add('show');
     launchConfetti();
   }
@@ -511,22 +643,21 @@
   }
 
   function launchConfetti() {
-    const confettiColors = ['#ff6b35', '#ffba08', '#e8420e', '#ff8c42', '#ffd166', '#fff', '#ff4444', '#44ff44'];
-    const shapes = ['square', 'circle'];
+    const confettiColors = ['#ff8c42', '#ffba08', '#2a7ba5', '#48b4d4', '#e86b20', '#fff', '#87CEEB', '#f5e6d0'];
 
     for (let i = 0; i < 120; i++) {
       const piece = document.createElement('div');
       piece.classList.add('confetti-piece');
       const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-      const shape = shapes[Math.floor(Math.random() * shapes.length)];
       const size = Math.random() * 10 + 6;
+      const isCircle = Math.random() > 0.5;
 
       piece.style.width = size + 'px';
       piece.style.height = size + 'px';
       piece.style.background = color;
       piece.style.left = Math.random() * 100 + 'vw';
       piece.style.top = '-10px';
-      piece.style.borderRadius = shape === 'circle' ? '50%' : '2px';
+      piece.style.borderRadius = isCircle ? '50%' : '2px';
       piece.style.animation = `confettiFall ${Math.random() * 2 + 2}s linear ${Math.random() * 0.5}s forwards`;
 
       document.body.appendChild(piece);
@@ -537,20 +668,60 @@
     }, 5000);
   }
 
-  // Lava bubbles background
-  function createBubble() {
+  // Spawn fish
+  function spawnFish() {
+    const fish = document.createElement('div');
+    fish.classList.add('fish');
+    const type = FISH_TYPES[Math.floor(Math.random() * FISH_TYPES.length)];
+    const goLeft = Math.random() > 0.5;
+
+    fish.textContent = type.emoji;
+    fish.style.fontSize = type.size + 'px';
+    fish.style.bottom = (Math.random() * 120 + 20) + 'px';
+    fish.style.opacity = (Math.random() * 0.3 + 0.3).toFixed(2);
+
+    if (goLeft) {
+      fish.classList.add('left');
+    }
+
+    const dur = Math.random() * 15 + 12;
+    fish.style.animationDuration = dur + 's';
+    fish.style.animationDelay = (Math.random() * 2) + 's';
+
+    document.body.appendChild(fish);
+    setTimeout(() => fish.remove(), (dur + 3) * 1000);
+  }
+
+  setInterval(spawnFish, 3000);
+  for (let i = 0; i < 4; i++) setTimeout(spawnFish, i * 800);
+
+  // Spawn bubbles
+  function spawnBubble() {
     const bubble = document.createElement('div');
-    bubble.classList.add('lava-bubble');
-    const size = Math.random() * 40 + 10;
+    bubble.classList.add('bubble');
+    const size = Math.random() * 20 + 6;
     bubble.style.width = size + 'px';
     bubble.style.height = size + 'px';
     bubble.style.left = Math.random() * 100 + 'vw';
-    bubble.style.animationDuration = (Math.random() * 8 + 6) + 's';
+    bubble.style.animationDuration = (Math.random() * 10 + 8) + 's';
     document.body.appendChild(bubble);
-    setTimeout(() => bubble.remove(), 14000);
+    setTimeout(() => bubble.remove(), 18000);
   }
 
-  setInterval(createBubble, 800);
+  setInterval(spawnBubble, 1200);
+
+  // Spawn seagulls
+  function spawnGull() {
+    const gull = document.createElement('div');
+    gull.classList.add('seagull');
+    gull.style.top = (Math.random() * 80 + 20) + 'px';
+    gull.style.animationDuration = (Math.random() * 20 + 15) + 's';
+    document.body.appendChild(gull);
+    setTimeout(() => gull.remove(), 36000);
+  }
+
+  setInterval(spawnGull, 8000);
+  setTimeout(spawnGull, 2000);
 
   // Editor
   function toggleEditor() {
