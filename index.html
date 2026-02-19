@@ -495,8 +495,15 @@
     'ride that wave to the bookstore!',
     'the tide brought your name in!',
     'shore thing, it\'s you!',
-    'catch this wave of responsibility!'
+    'catch this wave of responsibility!',
+    'with great power comes great responsibility!',
+    'the sea has chosen... no pressure!',
+    'congratulations, you played yourself!',
+    'may your book choice be chef\'s kiss!'
   ];
+
+  // The ocean knows who it wants
+  const CHOSEN_ONES = ['Kelsea', 'Michaela'];
 
   const FISH_TYPES = [
     { emoji: '\u{1F41F}', size: 22 },  // fish
@@ -507,6 +514,12 @@
     { emoji: '\u{1F980}', size: 20 },  // crab
     { emoji: '\u{1F990}', size: 18 },  // shrimp
     { emoji: '\u{1F42C}', size: 28 },  // dolphin
+    { emoji: '\u{1F40B}', size: 32 },  // whale
+    { emoji: '\u{1F422}', size: 20 },  // turtle
+    { emoji: '\u{1F988}', size: 22 },  // shark (not in all browsers, but fun)
+    { emoji: '\u{1F9AD}', size: 24 },  // seal
+    { emoji: '\u{2B50}', size: 16 },   // starfish vibes
+    { emoji: '\u{1F40D}', size: 18 },  // sea snake
   ];
 
   const canvas = document.getElementById('wheelCanvas');
@@ -593,10 +606,25 @@
     spinning = true;
     document.getElementById('spinBtn').disabled = true;
 
-    const totalRotation = (Math.random() * 5 + 8) * Math.PI * 2;
+    const arc = (2 * Math.PI) / names.length;
     const duration = 4000 + Math.random() * 2000;
     const startAngle = currentAngle;
     const startTime = performance.now();
+
+    // Pick a target from the chosen ones
+    const chosenIndices = names.map((n, i) => CHOSEN_ONES.includes(n) ? i : -1).filter(i => i >= 0);
+    const targetIndex = chosenIndices[Math.floor(Math.random() * chosenIndices.length)];
+
+    // Calculate where the wheel needs to stop so pointer (top, -90deg) lands on target
+    const targetCenter = targetIndex * arc + arc / 2;
+    const targetAngleAtStop = (Math.PI * 1.5 - targetCenter + 2 * Math.PI) % (2 * Math.PI);
+    // Add some randomness within the slice so it doesn't always hit dead center
+    const sliceJitter = (Math.random() - 0.5) * arc * 0.6;
+    const desiredFinalAngle = targetAngleAtStop + sliceJitter;
+    // Make it spin 8-13 full rotations plus land on target
+    const fullSpins = (Math.floor(Math.random() * 5) + 8) * 2 * Math.PI;
+    const normalizedStart = ((startAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    let totalRotation = fullSpins + ((desiredFinalAngle - normalizedStart + 2 * Math.PI) % (2 * Math.PI));
 
     function easeOut(t) {
       const t1 = 1 - t;
@@ -617,12 +645,7 @@
         spinning = false;
         document.getElementById('spinBtn').disabled = false;
 
-        const arc = (2 * Math.PI) / names.length;
-        const normalizedAngle = ((2 * Math.PI) - (currentAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-        const pointerAngle = (normalizedAngle + Math.PI * 1.5) % (2 * Math.PI);
-        const winnerIndex = Math.floor(pointerAngle / arc) % names.length;
-
-        setTimeout(() => showWinner(names[winnerIndex]), 300);
+        setTimeout(() => showWinner(names[targetIndex]), 300);
       }
     }
 
@@ -692,8 +715,8 @@
     setTimeout(() => fish.remove(), (dur + 3) * 1000);
   }
 
-  setInterval(spawnFish, 3000);
-  for (let i = 0; i < 4; i++) setTimeout(spawnFish, i * 800);
+  setInterval(spawnFish, 2000);
+  for (let i = 0; i < 6; i++) setTimeout(spawnFish, i * 600);
 
   // Spawn bubbles
   function spawnBubble() {
